@@ -1,0 +1,593 @@
+/* ============================================================
+   Password Strength Checker — Design System
+   ============================================================ */
+
+/* ----- CSS Custom Properties ----- */
+:root {
+  --bg-body: #07070e;
+  --bg-card: rgba(18, 19, 30, 0.85);
+  --bg-card-solid: #12131e;
+  --bg-input: rgba(14, 15, 24, 0.9);
+  --bg-tip: rgba(18, 19, 30, 0.6);
+
+  --text-primary: #f0f0f5;
+  --text-secondary: #8789a0;
+  --text-muted: #54567a;
+
+  --accent: #6c63ff;
+  --accent-dim: rgba(108, 99, 255, 0.15);
+
+  --success: #34d399;
+  --success-dim: rgba(52, 211, 153, 0.12);
+
+  --warning: #f59e0b;
+  --warning-dim: rgba(245, 158, 11, 0.12);
+
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.12);
+
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --font: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'SF Mono', monospace;
+}
+
+/* ----- Reset & Base ----- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ----- Background Grid Pattern ----- */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ----- Layout ----- */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 2rem;
+}
+
+/* ----- Header ----- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  background: var(--accent-dim);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ----- Cards ----- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ----- Badge (Disclaimer) ----- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.45rem 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ----- Input Group ----- */
+.input-group {
+  margin-bottom: 1.25rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.55rem;
+}
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.password-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+#password-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+#password-input::placeholder {
+  color: var(--text-muted);
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.55rem 0.8rem;
+  color: var(--text-muted);
+  transition: color 0.15s;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.toggle-btn:hover {
+  color: var(--text-secondary);
+}
+
+.icon-eye { display: block; }
+.icon-eye.hidden { display: none; }
+
+/* ----- Strength Meter ----- */
+.meter-section {
+  margin-bottom: 0.85rem;
+}
+
+.meter-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.strength-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.strength-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  flex: 1;
+  transition: color 0.3s ease;
+}
+
+.score-display {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Strength state colors */
+.strength-none .strength-value { color: var(--text-muted); }
+.strength-weak .strength-value { color: var(--danger); }
+.strength-medium .strength-value { color: var(--warning); }
+.strength-strong .strength-value { color: var(--success); }
+
+/* Progress bar */
+.progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: visible;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 3px;
+  position: relative;
+  will-change: width;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.3s ease;
+  background: var(--text-muted);
+}
+
+.progress-glow {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px 2px currentColor;
+}
+
+/* ----- Crack Time ----- */
+.crack-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  margin-bottom: 1.15rem;
+  padding: 0.45rem 0;
+  color: var(--text-secondary);
+}
+
+.crack-label {
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+#crack-time-text {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----- Generate Button ----- */
+.btn-generate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  margin-bottom: 0.25rem;
+}
+
+.btn-generate:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-generate:active {
+  transform: scale(0.97);
+}
+
+/* ----- Divider ----- */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.25rem 0 1rem;
+}
+
+/* ----- Section Titles ----- */
+.section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.85rem;
+}
+
+/* ----- Checklist ----- */
+.checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.35rem 0;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.check-item.missing {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.check-item.satisfied {
+  color: var(--success);
+  opacity: 1;
+}
+
+/* Custom check circle (CSS-only, no emoji) */
+.check-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+}
+
+.check-item.missing .check-circle {
+  border-color: var(--text-muted);
+  background: transparent;
+}
+
+.check-item.satisfied .check-circle {
+  border-color: var(--success);
+  background: var(--success);
+  transform: scale(1.05);
+}
+
+/* Checkmark via CSS pseudo-element */
+.check-item.satisfied .check-circle::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: solid #0a0a12;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+/* Cross via CSS pseudo-elements */
+.check-item.missing .check-circle::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  background: var(--text-muted);
+  transform: translate(-50%, -50%) rotate(45deg);
+  top: 50%;
+  left: 50%;
+}
+.check-item.missing .check-circle::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  background: var(--text-muted);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  top: 50%;
+  left: 50%;
+}
+
+.check-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ----- Feedback ----- */
+.feedback-section {
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.feedback-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.feedback-list li {
+  font-size: 0.84rem;
+  font-weight: 500;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-sm);
+  animation: slideUp 0.3s ease forwards;
+}
+
+.feedback-list li.feedback-warning {
+  color: var(--warning);
+  background: var(--warning-dim);
+  border-left: 3px solid var(--warning);
+}
+
+.feedback-list li.feedback-good {
+  color: var(--success);
+  background: var(--success-dim);
+  border-left: 3px solid var(--success);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----- Security Tips Section ----- */
+.tips-section {
+  margin-top: 0.5rem;
+}
+
+.tips-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.tip-card {
+  background: var(--bg-tip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.15rem;
+  transition: border-color 0.25s, transform 0.2s;
+}
+
+.tip-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.tip-number {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.tip-card h3 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.tip-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ----- Footer ----- */
+footer {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.footer-small {
+  font-size: 0.72rem;
+  margin-top: 0.3rem;
+  opacity: 0.6;
+}
+
+/* ----- Focus Visible (Accessibility) ----- */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem 0.85rem 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.15rem;
+  }
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meter-header {
+    flex-wrap: wrap;
+  }
+
+  .strength-value {
+    min-width: 60px;
+  }
+}
+
+/* ----- Selection Color ----- */
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
